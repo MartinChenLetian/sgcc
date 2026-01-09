@@ -91,7 +91,7 @@ const PCView = () => {
         { title: '户号', dataIndex: 'user_no', width: 100 },
         { title: '户名', dataIndex: 'user_name', width: 120 },
         { title: '地址', dataIndex: 'address', width: 250 },
-        { title: '通讯录备注', dataIndex: 'match_display_name', width: 150 },
+        // { title: '通讯录备注', dataIndex: 'match_display_name', width: 150 },
         { title: '电话1', dataIndex: 'match_business' },
         { title: '电话2', dataIndex: 'match_home' },
         { title: '电话3', dataIndex: 'match_mobile' },

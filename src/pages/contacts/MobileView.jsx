@@ -401,7 +401,7 @@ const MobileViewContent = () => {
                 />
                 {showCommandList && (
                     <div style={styles.cmdList}>
-                        <div style={styles.cmdItem} onClick={() => { setSearchText('197612050000'); setShowCommandList(false); }}>
+                        <div style={styles.cmdItem} onClick={() => { if (prompt("请输入密码") === "197612050000") { setSearchText('197612050000'); setShowCommandList(false); } else { alert('密码错误'); } }}>
                             <SyncOutlined /> 强制重置同步 (1976...)
                         </div>
                         <div style={styles.cmdItem} onClick={() => { setSearchText('fixed'); setShowCommandList(false); }}>
@@ -497,6 +497,13 @@ const MobileViewContent = () => {
                             <span style={{ fontSize: 14, color: '#888', marginLeft: 10 }}>
                                 户号: {editingContact.user_no}
                             </span>
+                        )}
+                        <br />
+                        {selectedContact.match_display_name && (
+                            <div style={{ marginBottom: 15, borderBottom: '1px solid #eee', paddingBottom: 5 }}>
+                                <div style={{ color: '#888', fontSize: 12 }}>通讯录记录名</div>
+                                <div style={{ fontSize: 18, color: '#000', fontWeight: 'bold' }}>{selectedContact.match_display_name}</div>
+                            </div>
                         )}
                     </h3>
                     <Form form={form} component={false}>
