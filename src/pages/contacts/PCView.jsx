@@ -169,7 +169,7 @@ const PCView = () => {
                 destroyOnClose
             >
                 <Form form={form} layout="vertical">
-                    <Form.Item name="address" label="地址" rules={[{ required: true }]}>
+                    <Form.Item name="address" label="地址" rules={[{ required: true }]} disabled>
                         <Input placeholder="例：宜川路413弄10号101室" />
                     </Form.Item>
                     <Form.Item name="match_business" label="电话">
