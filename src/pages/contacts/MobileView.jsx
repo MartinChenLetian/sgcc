@@ -500,7 +500,6 @@ const MobileViewContent = () => {
                         )}
                     </h3>
                     <Form form={form} component={false}>
-                        <Form.Item name="match_display_name"><Input placeholder="备注" /></Form.Item>
                         <Form.Item name="match_business"><Input placeholder="电话" /></Form.Item>
                         <Form.Item name="match_home"><Input placeholder="电话" /></Form.Item>
                         <Form.Item name="match_mobile"><Input placeholder="电话" /></Form.Item>
