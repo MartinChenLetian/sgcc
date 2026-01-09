@@ -486,6 +486,7 @@ const MobileViewContent = () => {
                 <div style={{ padding: 20 }}>
                     <h3>
                         {editingContact?.address}
+                        <br />
                         {editingContact?.user_no && (
                             <span style={{ fontSize: 14, color: '#888', marginLeft: 10 }}>
                                 户号: {editingContact.user_no}
@@ -499,11 +500,11 @@ const MobileViewContent = () => {
                     </h3>
                     <Form form={form} component={false}>
                         <Form.Item name="match_display_name"><Input placeholder="备注" /></Form.Item>
-                        <Form.Item name="match_business"><Input placeholder="常用电话" /></Form.Item>
-                        <Form.Item name="match_home"><Input placeholder="住宅电话" /></Form.Item>
-                        <Form.Item name="match_mobile"><Input placeholder="移动电话" /></Form.Item>
-                        <Form.Item name="match_phone4"><Input placeholder="电话4" /></Form.Item>
-                        <Form.Item name="match_phone5"><Input placeholder="电话5" /></Form.Item>
+                        <Form.Item name="match_business"><Input placeholder="电话" /></Form.Item>
+                        <Form.Item name="match_home"><Input placeholder="电话" /></Form.Item>
+                        <Form.Item name="match_mobile"><Input placeholder="电话" /></Form.Item>
+                        <Form.Item name="match_phone4"><Input placeholder="电话" /></Form.Item>
+                        <Form.Item name="match_phone5"><Input placeholder="电话" /></Form.Item>
                     </Form>
                     <Button type="primary" block icon={<SaveOutlined />} onClick={handleSaveContact}>保存</Button>
                     <Button type="text" block onClick={() => setEditModalVisible(false)} style={{ marginTop: 10 }}>取消</Button>
