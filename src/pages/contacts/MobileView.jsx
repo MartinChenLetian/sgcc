@@ -499,10 +499,10 @@ const MobileViewContent = () => {
                             </span>
                         )}
                         <br />
-                        {selectedContact.match_display_name && (
+                        {editingContact?.match_display_name && (
                             <div style={{ marginBottom: 15, borderBottom: '1px solid #eee', paddingBottom: 5 }}>
                                 <div style={{ color: '#888', fontSize: 12 }}>通讯录记录名</div>
-                                <div style={{ fontSize: 18, color: '#000', fontWeight: 'bold' }}>{selectedContact.match_display_name}</div>
+                                <div style={{ fontSize: 18, color: '#000', fontWeight: 'bold' }}>{editingContact.match_display_name}</div>
                             </div>
                         )}
                     </h3>
