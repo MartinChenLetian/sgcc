@@ -132,7 +132,7 @@ const PCView = () => {
                             setEditingItem(null);
                             form.resetFields();
                             setIsModalOpen(true);
-                        }}>新增用户</Button>
+                        }} disabled>新增用户</Button>
                     </Space>
                 }
             >
