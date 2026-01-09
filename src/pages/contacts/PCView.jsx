@@ -9,7 +9,7 @@ const PCView = () => {
     const [searchText, setSearchText] = useState('');
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
-    const PAGE_SIZE = 1000;
+    const [pageSize, setPageSize] = useState(1000);
 
     // 编辑/新增状态
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,8 +21,8 @@ const PCView = () => {
         setLoading(true);
         try {
             // 计算分页范围
-            const from = (page - 1) * PAGE_SIZE;
-            const to = from + PAGE_SIZE - 1;
+            const from = (page - 1) * pageSize;
+            const to = from + pageSize - 1;
 
             let query = supabase
                 .from('master_records')
@@ -150,11 +150,16 @@ const PCView = () => {
                     loading={loading}
                     dataSource={data}
                     columns={columns}
+                    scroll={{ y: 'calc(100vh - 64px - 120px)' }}
                     pagination={{
                         current: page,
-                        pageSize: PAGE_SIZE,
+                        pageSize: pageSize,
                         total: total,
-                        onChange: (p) => setPage(p),
+                        showSizeChanger: true,
+                        onChange: (p, size) => {
+                            setPage(p),
+                            setPageSize(size);
+                        },
                         showTotal: (t) => `共 ${t} 条记录`
                     }}
                 />
