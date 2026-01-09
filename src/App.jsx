@@ -16,7 +16,8 @@ const App = () => {
           {/* 内嵌显示https://photo.cl.sg-nus.com外部链接 */}
           <Route path="external" element={<ExternalPage targetUrl="https://photo.cl.sg-nus.com" />} />
           <Route path="xlsx" element={<div>Excel 导出页面 (待实现)</div>} />
-          
+          <Route path='downloadFormula' element={<ExternalPage targetUrl="https://xlsx.sg-nus.com/" />} />
+
           {/* 重定向未匹配路径到首页 */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

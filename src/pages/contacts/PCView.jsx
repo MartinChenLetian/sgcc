@@ -88,11 +88,15 @@ const PCView = () => {
 
     // === 3. 表格列定义 ===
     const columns = [
-        { title: 'ID', dataIndex: 'id', width: 80 },
-        { title: '地址 / 户名', dataIndex: 'address', width: 250 },
-        { title: '电话', dataIndex: 'match_business' },
-        { title: '电话', dataIndex: 'match_home' },
-        { title: '电话', dataIndex: 'match_mobile' },
+        { title: '户号', dataIndex: 'user_no', width: 100 },
+        { title: '户名', dataIndex: 'user_name', width: 120 },
+        { title: '地址', dataIndex: 'address', width: 250 },
+        { title: '通讯录备注', dataIndex: 'match_display_name', width: 150 },
+        { title: '电话1', dataIndex: 'match_business' },
+        { title: '电话2', dataIndex: 'match_home' },
+        { title: '电话3', dataIndex: 'match_mobile' },
+        { title: '电话4', dataIndex: 'match_phone4' },
+        { title: '电话5', dataIndex: 'match_phone5' },
         {
             title: '操作',
             key: 'action',

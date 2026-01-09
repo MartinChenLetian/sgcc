@@ -285,7 +285,10 @@ const MobileViewContent = () => {
                 payload: {
                     match_business: values.match_business,
                     match_home: values.match_home,
-                    match_mobile: values.match_mobile
+                    match_mobile: values.match_mobile,
+                    match_phone4: values.match_phone4,
+                    match_phone5: values.match_phone5,
+                    match_display_name: values.match_display_name,
                 },
                 timestamp: Date.now()
             };
@@ -419,7 +422,7 @@ const MobileViewContent = () => {
                 {flatData.slice(0, visibleCount).map((item, idx) => {
                     if (item.type === 'header') return <div key={idx} style={styles.group}>{item.title}</div>;
                     const c = item.data;
-                    const has = c.match_business || c.match_home || c.match_mobile;
+                    const has = c.match_business || c.match_home || c.match_mobile || c.match_phone4 || c.match_phone5;
                     return (
                         <div
                             key={c.id}
@@ -444,13 +447,33 @@ const MobileViewContent = () => {
                 {selectedContact && (
                     <div style={{ padding: 24 }}>
                         <h2 style={{ fontSize: 20 }}>{selectedContact.address}</h2>
+                        {selectedContact.user_no && (
+                            <div style={{ marginBottom: 15, borderBottom: '1px solid #eee', paddingBottom: 5 }}>
+                                <div style={{ color: '#888', fontSize: 12 }}>户号</div>
+                                <div style={{ fontSize: 18, color: '#000', fontWeight: 'bold' }}>{selectedContact.user_no}</div>
+                            </div>
+                        )}
+                        {selectedContact.user_name && (
+                            <div style={{ marginBottom: 15, borderBottom: '1px solid #eee', paddingBottom: 5 }}>
+                                <div style={{ color: '#888', fontSize: 12 }}>户名</div>
+                                <div style={{ fontSize: 18, color: '#000', fontWeight: 'bold' }}>{selectedContact.user_name}</div>
+                            </div>
+                        )}
+                        {selectedContact.match_display_name && (
+                            <div style={{ marginBottom: 15, borderBottom: '1px solid #eee', paddingBottom: 5 }}>
+                                <div style={{ color: '#888', fontSize: 12 }}>通讯录记录名</div>
+                                <div style={{ fontSize: 18, color: '#000', fontWeight: 'bold' }}>{selectedContact.match_display_name}</div>
+                            </div>
+                        )}
                         {[
                             { l: '常用', v: selectedContact.match_business },
                             { l: '住宅', v: selectedContact.match_home },
-                            { l: '移动', v: selectedContact.match_mobile }
+                            { l: '移动', v: selectedContact.match_mobile },
+                            { l: '电话4', v: selectedContact.match_phone4 },
+                            { l: '电话5', v: selectedContact.match_phone5 },
                         ].map((p, i) => p.v && (
                             <div key={i} style={{ marginBottom: 15, borderBottom: '1px solid #eee', paddingBottom: 5 }}>
-                                <div style={{ color: '#888', fontSize: 12 }}>{p.l}电话</div>
+                                <div style={{ color: '#888', fontSize: 12 }}>{p.l}</div>
                                 <a href={`tel:${p.v}`} style={{ fontSize: 18, color: '#1890ff', fontWeight: 'bold' }}>{p.v}</a>
                             </div>
                         ))}
@@ -461,12 +484,26 @@ const MobileViewContent = () => {
 
             <Modal open={editModalVisible} onCancel={() => setEditModalVisible(false)} footer={null} centered width="85vw" closeIcon={null}>
                 <div style={{ padding: 20 }}>
-                    <h3>{editingContact?.address}</h3>
-                    <div style={{ color: '#faad14', marginBottom: 20 }}><PlusOutlined /> 补全电话</div>
+                    <h3>
+                        {editingContact?.address}
+                        {editingContact?.user_no && (
+                            <span style={{ fontSize: 14, color: '#888', marginLeft: 10 }}>
+                                户号: {editingContact.user_no}
+                            </span>
+                        )}
+                        {editingContact?.user_name && (
+                            <span style={{ fontSize: 14, color: '#888', marginLeft: 10 }}>
+                                户名: {editingContact.user_name}
+                            </span>
+                        )}
+                    </h3>
                     <Form form={form} component={false}>
+                        <Form.Item name="match_display_name"><Input placeholder="备注" /></Form.Item>
                         <Form.Item name="match_business"><Input placeholder="常用电话" /></Form.Item>
                         <Form.Item name="match_home"><Input placeholder="住宅电话" /></Form.Item>
                         <Form.Item name="match_mobile"><Input placeholder="移动电话" /></Form.Item>
+                        <Form.Item name="match_phone4"><Input placeholder="电话4" /></Form.Item>
+                        <Form.Item name="match_phone5"><Input placeholder="电话5" /></Form.Item>
                     </Form>
                     <Button type="primary" block icon={<SaveOutlined />} onClick={handleSaveContact}>保存</Button>
                     <Button type="text" block onClick={() => setEditModalVisible(false)} style={{ marginTop: 10 }}>取消</Button>
