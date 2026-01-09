@@ -91,7 +91,7 @@ const PCView = () => {
         {
             title: '户号',
             dataIndex: 'user_no',
-            width: 100, 
+            width: 150, 
             render: (text, record) => (
                 <span title={record.match_display_name}>{text}</span>
             )
