@@ -487,14 +487,15 @@ const MobileViewContent = () => {
                     <h3>
                         {editingContact?.address}
                         <br />
-                        {editingContact?.user_no && (
-                            <span style={{ fontSize: 14, color: '#888', marginLeft: 10 }}>
-                                户号: {editingContact.user_no}
-                            </span>
-                        )}
                         {editingContact?.user_name && (
                             <span style={{ fontSize: 14, color: '#888', marginLeft: 10 }}>
                                 户名: {editingContact.user_name}
+                            </span>
+                        )}
+                        <br />
+                        {editingContact?.user_no && (
+                            <span style={{ fontSize: 14, color: '#888', marginLeft: 10 }}>
+                                户号: {editingContact.user_no}
                             </span>
                         )}
                     </h3>

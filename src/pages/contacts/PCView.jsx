@@ -9,7 +9,7 @@ const PCView = () => {
     const [searchText, setSearchText] = useState('');
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
-    const PAGE_SIZE = 10;
+    const PAGE_SIZE = 1000;
 
     // 编辑/新增状态
     const [isModalOpen, setIsModalOpen] = useState(false);
