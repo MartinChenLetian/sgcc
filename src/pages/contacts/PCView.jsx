@@ -150,7 +150,7 @@ const PCView = () => {
                     loading={loading}
                     dataSource={data}
                     columns={columns}
-                    scroll={{ y: 'calc(100vh - 64px - 120px)' }}
+                    scroll={{ y: 500 }}
                     pagination={{
                         current: page,
                         pageSize: pageSize,
