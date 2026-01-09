@@ -129,7 +129,7 @@ const MainLayout = () => {
                         </Space>
                     </Header>
 
-                    <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', flex: 1, overflowY: 'auto' }}>
+                    <Content style={{ margin: '24px 16px', background: '#fff', flex: 1, overflowY: 'auto' }}>
                         {/* 这里的 Outlet 就是用来显示子页面的窗口 */}
                         <Outlet />
                     </Content>
