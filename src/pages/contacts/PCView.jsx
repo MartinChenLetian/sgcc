@@ -9,7 +9,7 @@ const PCView = () => {
     const [searchText, setSearchText] = useState('');
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(1000);
+    const [pageSize, setPageSize] = useState(100);
 
     // 编辑/新增状态
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -91,19 +91,16 @@ const PCView = () => {
         {
             title: '户号',
             dataIndex: 'user_no',
-            width: 150, 
-            render: (text, record) => (
-                <span title={record.match_display_name}>{text}</span>
-            )
+            width: 150,
+            ellipsis: { title: true }
         },
         {
             title: '户名',
             dataIndex: 'user_name',
             width: 120,
-            render: (text, record) => (
-            <span title={record.match_display_name}>{text}</span>
-        ) },
-        { title: '地址', dataIndex: 'address', width: 250, ellipsis: { showTitle: true } },
+            ellipsis: { title: true }
+        },
+        { title: '地址', dataIndex: 'address', width: 250, ellipsis: true },
         // { title: '通讯录备注', dataIndex: 'match_display_name', width: 150 },
         { title: '电话1', dataIndex: 'match_business' },
         { title: '电话2', dataIndex: 'match_home' },
@@ -160,10 +157,11 @@ const PCView = () => {
 
                 <Table
                     rowKey="id"
+                    tableLayout='fixed'
                     loading={loading}
                     dataSource={data}
                     columns={columns}
-                    scroll={{ y: 500 }}
+                    scroll={{ y: 'calc(100vh - 240px)' }}
                     pagination={{
                         current: page,
                         pageSize: pageSize,
