@@ -91,7 +91,7 @@ const PCView = () => {
         {
             title: '户号',
             dataIndex: 'user_no',
-            width: 150,
+            width: 140,
             ellipsis: { title: true }
         },
         {
@@ -100,7 +100,7 @@ const PCView = () => {
             width: 120,
             ellipsis: { title: true }
         },
-        { title: '地址', dataIndex: 'address', width: 250, ellipsis: true },
+        { title: '地址', dataIndex: 'address', width: 220, ellipsis: true },
         // { title: '通讯录备注', dataIndex: 'match_display_name', width: 150 },
         { title: '电话1', dataIndex: 'match_business' },
         { title: '电话2', dataIndex: 'match_home' },
@@ -110,7 +110,7 @@ const PCView = () => {
         {
             title: '操作',
             key: 'action',
-            width: 150,
+            width: 100,
             render: (_, record) => (
                 <Space>
                     <Button
@@ -123,6 +123,7 @@ const PCView = () => {
                     >
                         编辑
                     </Button>
+                    <br />
                     <Popconfirm title="确定删除吗?" onConfirm={() => handleDelete(record.id)}>
                         <Button type="primary" size="small" danger ghost icon={<DeleteOutlined />}>删除</Button>
                     </Popconfirm>
@@ -161,6 +162,8 @@ const PCView = () => {
                     loading={loading}
                     dataSource={data}
                     columns={columns}
+                    virtual
+                    sticky
                     scroll={{ y: 'calc(100vh - 470px)' }}
                     pagination={{
                         current: page,
@@ -182,7 +185,7 @@ const PCView = () => {
                 open={isModalOpen}
                 onOk={handleSave}
                 onCancel={() => setIsModalOpen(false)}
-                destroyOnClose
+                destroyOnHidden
             >
                 <Form form={form} layout="vertical">
                     <Form.Item name="address" label="地址" rules={[{ required: true }]} disabled>
