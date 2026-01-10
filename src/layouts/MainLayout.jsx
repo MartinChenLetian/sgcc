@@ -110,8 +110,8 @@ const MainLayout = () => {
                     />
                 </Sider>
 
-                <Layout>
-                    <Header style={{ padding: '0 24px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 4px rgba(0,21,41,0.08)' }}>
+                <Layout style={{ height: '100vh', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                    <Header style={{ padding: '0 24px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 4px rgba(0,21,41,0.08)', flex: '0 0 auto' }}>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                             {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
                                 className: 'trigger',
@@ -129,12 +129,23 @@ const MainLayout = () => {
                         </Space>
                     </Header>
 
-                    <Content style={{ margin: '24px 16px', background: '#fff' }}>
-                        {/* 这里的 Outlet 就是用来显示子页面的窗口 */}
+                    <Content
+                      style={{
+                        margin: '24px 16px',
+                        background: '#fff',
+                        flex: '1 1 auto',
+                        minHeight: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      {/* 这里的 Outlet 就是用来显示子页面的窗口 */}
+                      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
                         <Outlet />
+                      </div>
                     </Content>
 
-                    <Footer style={{ textAlign: 'center', color: '#999', fontSize: 12 }}>
+                    <Footer style={{ textAlign: 'center', color: '#999', fontSize: 12, flex: '0 0 auto' }}>
                         SGCC Digital Workbench ©{new Date().getFullYear()} Created by Mr. Chen
                     </Footer>
                 </Layout>

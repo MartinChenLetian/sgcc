@@ -11,6 +11,7 @@ const App = () => {
         <Route path="/" element={<MainLayout />}>
           {/* 默认首页就是通讯录 */}
           <Route index element={<ContactsIndex />} />
+          
           <Route path="report" element={<div>反馈条目报表页面 (待实现)</div>} />
           <Route path="compare" element={<div>智能对账系统页面 (待实现)</div>} />
           {/* 内嵌显示https://photo.cl.sg-nus.com外部链接 */}
