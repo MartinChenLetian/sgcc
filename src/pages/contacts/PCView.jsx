@@ -26,6 +26,13 @@ const PCView = () => {
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(100);
 
+    // 服务端排序（目前仅用于户号 user_no）
+    const [sortField, setSortField] = useState('id');
+    const [sortOrder, setSortOrder] = useState('asc'); // 'asc' | 'desc'
+
+    // 户名列标签筛选：存 user_remark 的 code（3字节）
+    const [nameTagCodes, setNameTagCodes] = useState([]);
+
     // 总页数计算
     const totalPages = useMemo(() => {
         const ps = Number(pageSize) || 1;
@@ -107,15 +114,41 @@ const PCView = () => {
             let query = supabase
                 .from('master_records')
                 .select('*', { count: 'exact' })
-                .order('id', { ascending: true })
+                .order(sortField, { ascending: sortOrder === 'asc' })
                 .range(from, to);
 
-            if (searchText) {
-                // 支持任意列搜索（户号/户名/地址/电话1~5）
-                // PostgREST 的 or() 用逗号分隔条件，所以把用户输入里的逗号替换为空格，避免解析冲突
-                const q = String(searchText).trim().replace(/,/g, ' ');
-                const pattern = `%${q}%`;
+            // --- 搜索和标签筛选组合 ---
+            const qRaw = String(searchText || '').trim();
+            const hasSearch = !!qRaw;
+            const codes = Array.isArray(nameTagCodes) ? nameTagCodes.filter(Boolean) : [];
+            const hasTagFilter = codes.length > 0;
 
+            // PostgREST 的 or() 用逗号分隔条件，用户输入包含逗号会影响解析
+            const safeQ = qRaw.replace(/,/g, ' ');
+            const pattern = `%${safeQ}%`;
+
+            // 生成 tag 条件：单个为 `user_remark.ilike.%abc%`，多个为 `or(user_remark.ilike.%a%,user_remark.ilike.%b%)`
+            const tagExpr = hasTagFilter
+                ? (codes.length === 1
+                    ? `user_remark.ilike.%${codes[0]}%`
+                    : `or(${codes.map((c) => `user_remark.ilike.%${c}%`).join(',')})`)
+                : '';
+
+            if (hasSearch && hasTagFilter) {
+                // 同时有搜索 + 标签筛选：用 or=and(tagExpr, fieldExpr) 的方式实现 (tag) AND (任意列匹配)
+                const branches = [
+                    `and(${tagExpr},user_no.ilike.${pattern})`,
+                    `and(${tagExpr},user_name.ilike.${pattern})`,
+                    `and(${tagExpr},address.ilike.${pattern})`,
+                    `and(${tagExpr},match_business.ilike.${pattern})`,
+                    `and(${tagExpr},match_home.ilike.${pattern})`,
+                    `and(${tagExpr},match_mobile.ilike.${pattern})`,
+                    `and(${tagExpr},match_phone4.ilike.${pattern})`,
+                    `and(${tagExpr},match_phone5.ilike.${pattern})`,
+                ].join(',');
+                query = query.or(branches);
+            } else if (hasSearch) {
+                // 仅任意列搜索
                 query = query.or(
                     [
                         `user_no.ilike.${pattern}`,
@@ -128,15 +161,20 @@ const PCView = () => {
                         `match_phone5.ilike.${pattern}`,
                     ].join(',')
                 );
+            } else if (hasTagFilter) {
+                // 仅标签筛选
+                if (codes.length === 1) {
+                    query = query.ilike('user_remark', `%${codes[0]}%`);
+                } else {
+                    query = query.or(codes.map((c) => `user_remark.ilike.%${c}%`).join(','));
+                }
             }
+
             const { data: records, error, count } = await query;
             if (error) throw error;
 
             setData(records || []);
             setTotal(count || 0);
-
-            // 切换页后：如果之前选中过跨页内容，会造成“当前页缺失”，这里不强制清空
-            // 让一致性 useEffect 自动禁用 Select 并提示即可
         } catch (err) {
             messageApi.error('加载失败: ' + (err?.message || String(err)));
         } finally {
@@ -147,7 +185,7 @@ const PCView = () => {
     useEffect(() => {
         fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, searchText, pageSize]);
+    }, [page, searchText, pageSize, sortField, sortOrder, nameTagCodes]);
 
     useEffect(() => {
         // 翻页/变更每页条数/搜索后：让表格滚动回到最上方
@@ -480,12 +518,18 @@ const PCView = () => {
             title: '户号',
             dataIndex: 'user_no',
             width: 160,
+            sorter: true,
+            sortOrder: sortField === 'user_no' ? (sortOrder === 'asc' ? 'ascend' : 'descend') : null,
         },
         {
             title: '户名',
             dataIndex: 'user_name',
             width: 160,
             ellipsis: { title: true },
+            filters: (tagOptions || [])
+                .filter((t) => typeof t === 'string')
+                .map((t) => ({ text: t, value: encryptTag3(t) })),
+            filteredValue: nameTagCodes.length ? nameTagCodes : null,
             render: (text, record) => {
                 const remarks = parseRemarks(record.user_remark);
                 const hasAny = remarks.length > 0;
@@ -523,8 +567,8 @@ const PCView = () => {
             title: '地址',
             dataIndex: 'address',
             width: 240,
-            ellipsis: { title: true },
-            render: (text) => <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{text}</span>
+            // ellipsis: { title: true },
+            render: (text) => <Tooltip title={text}><span>{text}</span></Tooltip>,
         },
         { title: '电话1', dataIndex: 'match_business', ellipsis: true },
         { title: '电话2', dataIndex: 'match_home', ellipsis: true },
@@ -550,7 +594,7 @@ const PCView = () => {
                         }}
                     />
                     <Popconfirm title="确定删除吗?" onConfirm={() => handleDelete(record.id)}>
-                        <Button type="primary" size="small" danger ghost icon={<DeleteOutlined />} />
+                        <Button type="primary" size="small" danger ghost icon={<DeleteOutlined />} disabled/>
                     </Popconfirm>
                 </Space>
             ),
@@ -623,7 +667,7 @@ const PCView = () => {
                 <div style={{ marginBottom: 12, display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
                     <div style={{ flex: 1, minWidth: 260, maxWidth: 520 }}>
                         <Input.Search
-                            placeholder="搜索户号/户名/地址/电话..."
+                            placeholder="搜索任意字段（户号/户名/地址/电话/标签）..."
                             onSearch={(val) => {
                                 setSearchText(val);
                                 setPage(1);
@@ -681,6 +725,25 @@ const PCView = () => {
                         sticky
                         scroll={{ y: scrollY }}
                         pagination={false}
+                        onChange={(_p, filters, sorter) => {
+                            // ---- 户号排序（服务端）----
+                            const s = Array.isArray(sorter) ? sorter[0] : sorter;
+                            if (s?.field === 'user_no' && s?.order) {
+                                setSortField('user_no');
+                                setSortOrder(s.order === 'ascend' ? 'asc' : 'desc');
+                                setPage(1);
+                            } else if (s?.field === 'user_no' && !s?.order) {
+                                // 取消排序 -> 回到默认
+                                setSortField('id');
+                                setSortOrder('asc');
+                                setPage(1);
+                            }
+
+                            // ---- 户名标签筛选（服务端）----
+                            const codes = (filters?.user_name || []).filter(Boolean);
+                            setNameTagCodes(codes);
+                            setPage(1);
+                        }}
                         onRow={(record) => ({
                             onClick: (e) => {
                                 // 点击行任意位置可切换选择（排除按钮/链接/输入/下拉）
