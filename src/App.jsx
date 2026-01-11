@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { Button, Input, Modal, Space, Typography, message, Spin, Tooltip } from 'antd';
+import { Button, Input, Modal, Space, Typography, message, Spin, Tooltip, Select } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 
 import MainLayout from './layouts/MainLayout';
@@ -19,6 +19,14 @@ const AdminShortcut = () => {
   const [loading, setLoading] = useState(false);
   const [mask, setMask] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+
+  // ===== Admin email selection (方案B：只发给所选邮箱) =====
+  // 你可以把这里改成从后端拉取配置；目前先写死两个超管邮箱。
+  const ADMIN_EMAIL_OPTIONS = [
+    { label: '陈珑', value: 'allenc761205@gmail.com' },
+    { label: '陈乐天', value: 'mclt12321@gmail.com' },
+  ];
+  const [adminEmail, setAdminEmail] = useState(ADMIN_EMAIL_OPTIONS[0]?.value || '');
 
   // ===== Admin session (10min) =====
   const ADMIN_KEY = 'sgcc_admin_session';
@@ -145,8 +153,10 @@ const AdminShortcut = () => {
     }
 
     setPwd('');
+    // 保留上次选择也可以：这里不强制重置 adminEmail
     setChallengeId(null);
-    requestOtp();
+    // 取消自动发送：等待用户选择邮箱后手动点击“发送验证码/重新发送”
+    setCooldownLeft(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -156,6 +166,11 @@ const AdminShortcut = () => {
       if (c.reason === 'cooldown') messageApi.warning(`操作过快，请 ${c.left}s 后再试`);
       else messageApi.warning(`发送过于频繁，请 ${c.left}s 后再试`);
       setCooldownLeft(c.left);
+      return;
+    }
+
+    if (!adminEmail) {
+      messageApi.warning('请选择要接收验证码的管理员邮箱');
       return;
     }
 
@@ -171,7 +186,7 @@ const AdminShortcut = () => {
     setMask(true);
     try {
       const { data, error } = await supabase.functions.invoke('admin_password_request', {
-        body: { reason: 'admin_login' },
+        body: { reason: 'admin_login', admin_email: adminEmail },
       });
       if (error) throw error;
 
@@ -193,11 +208,16 @@ const AdminShortcut = () => {
       return;
     }
 
+    if (!adminEmail) {
+      messageApi.warning('请选择要接收验证码的管理员邮箱');
+      return;
+    }
+
     setLoading(true);
     setMask(true);
     try {
       const { data, error } = await supabase.functions.invoke('admin_password_verify', {
-        body: { password: p, challenge_id: challengeId },
+        body: { password: p, challenge_id: challengeId, admin_email: adminEmail },
       });
       if (error) throw error;
 
@@ -245,7 +265,17 @@ const AdminShortcut = () => {
 
       <Modal title="超级管理员验证" open={open} onCancel={() => setOpen(false)} footer={null} destroyOnClose>
         <Space direction="vertical" style={{ width: '100%' }} size={10}>
-          <Text type="secondary">一次性密码已发送到你的邮箱（如未收到可点击重新发送）。</Text>
+          <Text type="secondary">请选择接收验证码的管理员邮箱，然后点击“发送验证码”（只会发送给所选邮箱）。</Text>
+          <Select
+            value={adminEmail}
+            onChange={(v) => setAdminEmail(v)}
+            options={ADMIN_EMAIL_OPTIONS}
+            style={{ width: '100%' }}
+            placeholder="请选择管理员邮箱"
+          />
+          <Text type="secondary" style={{ marginTop: -4 }}>
+            验证码将发送至：<b>{adminEmail || '未选择'}</b>
+          </Text>
           <Input.Password
             autoFocus
             value={pwd}
@@ -254,15 +284,23 @@ const AdminShortcut = () => {
             onPressEnter={verifyOtp}
           />
           <Space>
-            <Button type="primary" loading={loading} onClick={verifyOtp}>
+            <Button type="primary" loading={loading} onClick={verifyOtp} disabled={!challengeId}>
               确认
             </Button>
-            <Button loading={loading} onClick={requestOtp} disabled={cooldownLeft > 0}>
-              {cooldownLeft > 0 ? `重新发送（${cooldownLeft}s）` : '重新发送'}
+            <Button
+              loading={loading}
+              onClick={requestOtp}
+              disabled={cooldownLeft > 0 || !adminEmail}
+            >
+              {cooldownLeft > 0
+                ? `重新发送（${cooldownLeft}s）`
+                : challengeId
+                  ? '重新发送'
+                  : '发送验证码'}
             </Button>
           </Space>
           <Text type="secondary" style={{ fontSize: 12 }}>
-            快捷键触发：Ctrl/Cmd + Shift + B 打开验证；Esc 关闭弹窗；Ctrl/Cmd + Esc 退出超管（保留通行）
+            快捷键触发：Ctrl/Cmd + Shift + B 打开验证；Esc 关闭弹窗；Ctrl/Cmd + Esc 退出超管（保留通行）。注意：验证码仅发送给所选邮箱。
           </Text>
         </Space>
       </Modal>

@@ -90,6 +90,25 @@ const AdminLayout = () => {
   // keep-alive on every render
   refreshAdminSession();
 
+  // Ctrl/Cmd + Esc: exit admin (do NOT clear session)
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      const primaryKey = e.ctrlKey || e.metaKey; // Ctrl on Win/Linux, Cmd on macOS
+      const isEsc = e.key === 'Escape' || e.code === 'Escape';
+
+      if (primaryKey && isEsc) {
+        e.preventDefault();
+        e.stopPropagation();
+        // Keep session; just leave admin area
+        window.location.assign('/');
+      }
+    };
+
+    // capture=true to intercept browser/system handlers earlier
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, []);
+
   return (
     <div style={{ minHeight: '100vh', background: '#fff7e6' }}>
       <Layout style={{ minHeight: '100vh', background: 'transparent' }}>
